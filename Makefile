@@ -32,7 +32,7 @@ create_example_user:
 
 .PHONY:
 revoke_example_user:
-	docker run --rm -it -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_revokeclient $(EXAMPLE_USER) remove
+	docker run --rm -it -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) bash -c "echo 'yes' | ovpn_revokeclient $(EXAMPLE_USER) remove"
 
 .PHONY:
 clean:
