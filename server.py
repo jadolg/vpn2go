@@ -14,14 +14,17 @@ SERVICE_PASSWORD = os.getenv('SERVICE_PASSWORD')
 async def handle_create(request):
     post = await request.json()
     user = post.get('user')
-    client = docker.from_env()
-    client.containers.run(image=DOCKER_IMAGE, command=f"easyrsa build-client-full {user} nopass", remove=True,
-                          volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}})
-    output = client.containers.run(image=DOCKER_IMAGE, command=f"ovpn_getclient {user}",
-                                   remove=True,
-                                   detach=False,
-                                   volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}},
-                                   stdout=True)
+    if user:
+        client = docker.from_env()
+        client.containers.run(image=DOCKER_IMAGE, command=f"easyrsa build-client-full {user} nopass", remove=True,
+                              volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}})
+        output = client.containers.run(image=DOCKER_IMAGE, command=f"ovpn_getclient {user}",
+                                       remove=True,
+                                       detach=False,
+                                       volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}},
+                                       stdout=True)
+    else:
+        return web.Response(text="invalid user", status=400)
     return web.Response(text=output.decode('ascii'))
 
 
