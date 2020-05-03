@@ -31,6 +31,10 @@ create_example_user:
 	docker run -v $(OVPN_DATA):/etc/openvpn --log-driver=none --rm $(DOCKER_IMAGE) ovpn_getclient $(EXAMPLE_USER) > $(EXAMPLE_USER).ovpn
 
 .PHONY:
+revoke_example_user:
+	docker run --rm -it -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_revokeclient $(EXAMPLE_USER) remove
+
+.PHONY:
 clean:
 	rm -Rf docker-openvpn
 	rm -Rf $(OVPN_DATA)
