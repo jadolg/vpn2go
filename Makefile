@@ -20,14 +20,18 @@ run:
 	docker run --name openvpn -v $(OVPN_DATA):/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN -d $(DOCKER_IMAGE)
 
 .PHONY:
+stop:
+	docker stop openvpn
+	docker rm openvpn
+
+
+.PHONY:
 create_example_user:
 	docker run -v $(OVPN_DATA):/etc/openvpn --log-driver=none --rm $(DOCKER_IMAGE) easyrsa build-client-full $(EXAMPLE_USER) nopass
 	docker run -v $(OVPN_DATA):/etc/openvpn --log-driver=none --rm $(DOCKER_IMAGE) ovpn_getclient $(EXAMPLE_USER) > $(EXAMPLE_USER).ovpn
 
 .PHONY:
 clean:
-	docker stop openvpn
-	docker rm openvpn
 	rm -Rf docker-openvpn
 	rm -Rf $(OVPN_DATA)
 	rm -f $(EXAMPLE_USER).ovpn
