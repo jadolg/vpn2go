@@ -3,7 +3,7 @@ SERVER_ADDRESS ?= "192.168.0.56"
 CA ?= "myvpn"
 DOCKER_IMAGE ?= guamulo/openvpn
 REPOSITORY ?= https://github.com/jadolg/docker-openvpn.git
-EXAMPLE_USER ?= "user1"
+EXAMPLE_USER ?= user1
 
 .PHONY:
 build:
