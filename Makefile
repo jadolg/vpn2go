@@ -1,12 +1,13 @@
 OVPN_DATA ?= $(PWD)/"ovpn-data"
 SERVER_ADDRESS ?= "192.168.0.56"
 CA ?= "myvpn"
-DOCKER_IMAGE ?= guamulo/openvpn
-REPOSITORY ?= https://github.com/jadolg/docker-openvpn.git
+DOCKER_IMAGE ?= kylemanna/openvpn
+REPOSITORY ?= https://github.com/kylemanna/docker-openvpn.git
 EXAMPLE_USER ?= user1
 
 .PHONY:
 build:
+	docker build -t vpn2go .
 	git clone $(REPOSITORY)
 	cd docker-openvpn && docker build -t $(DOCKER_IMAGE) .
 
@@ -18,11 +19,12 @@ configure:
 .PHONY:
 run:
 	docker run --name openvpn -v $(OVPN_DATA):/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN -d $(DOCKER_IMAGE)
+	docker run -e DOCKER_IMAGE=$(DOCKER_IMAGE) -e OVPN_DATA=$(OVPN_DATA) --name vpn2go -v /var/run/docker.sock:/var/run/docker.sock -p 5000:5000 -d vpn2go
 
 .PHONY:
 stop:
-	docker stop openvpn
-	docker rm openvpn
+	docker stop openvpn vpn2go
+	docker rm openvpn vpn2go
 
 
 .PHONY:
