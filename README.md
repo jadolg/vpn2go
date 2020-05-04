@@ -1,6 +1,7 @@
 # Easy to deploy and manage OpenVPN server
 
-OpenVPN server with an API for user management
+OpenVPN server with an API for user management.
+Using this amazing project https://github.com/kylemanna/docker-openvpn
 
 ## Requirements
 
