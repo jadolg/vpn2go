@@ -3,6 +3,11 @@
 OpenVPN server with an API for user management.
 Using this amazing project https://github.com/kylemanna/docker-openvpn
 
+## Objective
+
+Using the docker-openvpn is simple and fun, but with time I wanted to automate my user management process and link it to other systems.
+The goal of this project is creating a basic configuration for docker-openvpn and an web API to manage the users.  
+
 ## Requirements
 
 - [Docker](https://www.docker.com/)
