@@ -43,6 +43,6 @@ revoke_example_user:
 .PHONY:
 clean:
 	rm -Rf docker-openvpn
-	rm -Rf $(OVPN_DATA)
+	sudo rm -Rf $(OVPN_DATA)
 	rm -f $(EXAMPLE_USER).ovpn
 	docker rmi $(DOCKER_IMAGE)
