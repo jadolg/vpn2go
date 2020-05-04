@@ -52,3 +52,9 @@ output: a text configuration for openvpn
 `curl -X DELETE -u SERVICE_USER:SERVICE_PASSWORD SERVER_ADDRESS:5000/username`
 
 output: ok
+
+### Get current status log
+
+`curl -u SERVICE_USER:SERVICE_PASSWORD SERVER_ADDRESS:5000/status`
+
+output: an openvpn status log
