@@ -5,7 +5,7 @@ import docker
 from aiohttp import web
 from aiohttp_basicauth import BasicAuthMiddleware
 
-DOCKER_IMAGE = os.getenv('DOCKER_IMAGE', 'guamulo/openvpn')
+DOCKER_IMAGE = os.getenv('DOCKER_IMAGE', 'kylemanna/openvpn')
 OVPN_DATA = os.getenv('OVPN_DATA', f'{os.getcwd()}/ovpn-data')
 SERVICE_USER = os.getenv('SERVICE_USER')
 SERVICE_PASSWORD = os.getenv('SERVICE_PASSWORD')
@@ -70,6 +70,14 @@ async def handle_get_all(request):
     return web.Response(text=get_certs_list().replace('.crt', ''))
 
 
+async def handle_status(request):
+    client = docker.from_env()
+    container = client.containers.get('openvpn')
+    output = container.exec_run(cmd="cat /tmp/openvpn-status.log")
+
+    return web.Response(text=output.output.decode('ascii'))
+
+
 async def handle_healthcheck(request):
     return web.Response(text='alive')
 
@@ -84,6 +92,7 @@ if __name__ == '__main__':
 
     app.add_routes([web.post('/', handle_create)])
     app.add_routes([web.get('/', handle_get_all)])
+    app.add_routes([web.get('/status', handle_status)])
     app.add_routes([web.delete('/{user}', handle_revoke)])
     app.add_routes([web.get('/{user}', handle_get)])
     app.add_routes([web.get('/healthcheck', handle_healthcheck)])
