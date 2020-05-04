@@ -11,20 +11,23 @@ SERVICE_USER = os.getenv('SERVICE_USER')
 SERVICE_PASSWORD = os.getenv('SERVICE_PASSWORD')
 
 
+def run_on_vpn_docker(command):
+    client = docker.from_env()
+    return client.containers.run(image=DOCKER_IMAGE, command=command,
+                                 remove=True,
+                                 detach=False,
+                                 volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}},
+                                 stdout=True)
+
+
 async def handle_create(request):
     post = await request.json()
     user = post.get('user')
     if user:
         if f'{user}.crt' in get_certs_list():
             return web.Response(text='duplicated', status=409)
-        client = docker.from_env()
-        client.containers.run(image=DOCKER_IMAGE, command=f"easyrsa build-client-full {user} nopass", remove=True,
-                              volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}})
-        output = client.containers.run(image=DOCKER_IMAGE, command=f"ovpn_getclient {user}",
-                                       remove=True,
-                                       detach=False,
-                                       volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}},
-                                       stdout=True)
+        run_on_vpn_docker(command=f"easyrsa build-client-full {user} nopass")
+        output = run_on_vpn_docker(command=f"ovpn_getclient {user}")
     else:
         return web.Response(text="invalid user", status=400)
     return web.Response(text=output.decode('ascii'))
@@ -33,10 +36,7 @@ async def handle_create(request):
 async def handle_revoke(request):
     user = request.match_info.get('user', "")
     if user != "" and f'{user}.crt' in get_certs_list():
-        client = docker.from_env()
-        client.containers.run(image=DOCKER_IMAGE, command=f"bash -c \"echo 'yes' | ovpn_revokeclient {user}\"",
-                              remove=True,
-                              volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}})
+        run_on_vpn_docker(command=f"bash -c \"echo 'yes' | ovpn_revokeclient {user}\"")
     else:
         return web.Response(text='not found', status=404)
     return web.Response(text='ok')
@@ -44,25 +44,15 @@ async def handle_revoke(request):
 
 async def handle_get(request):
     user = request.match_info.get('user', "")
-    client = docker.from_env()
     if f'{user}.crt' in get_certs_list():
-        output = client.containers.run(image=DOCKER_IMAGE, command=f"ovpn_getclient {user}",
-                                       remove=True,
-                                       detach=False,
-                                       volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}},
-                                       stdout=True)
+        output = run_on_vpn_docker(command=f"ovpn_getclient {user}")
         return web.Response(text=output.decode('ascii'))
     else:
         return web.Response(text='not found', status=404)
 
 
 def get_certs_list():
-    client = docker.from_env()
-    output = client.containers.run(image=DOCKER_IMAGE, command=f"ls /etc/openvpn/pki/issued",
-                                   remove=True,
-                                   detach=False,
-                                   volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}},
-                                   stdout=True)
+    output = run_on_vpn_docker(command=f"ls /etc/openvpn/pki/issued")
     return output.decode('ascii')
 
 
@@ -74,7 +64,6 @@ async def handle_status(request):
     client = docker.from_env()
     container = client.containers.get('openvpn')
     output = container.exec_run(cmd="cat /tmp/openvpn-status.log")
-
     return web.Response(text=output.output.decode('ascii'))
 
 
