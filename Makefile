@@ -1,6 +1,10 @@
-OVPN_DATA ?= $(PWD)/"ovpn-data"
+# You should REALLY change the credentials for production environments
+SERVICE_USER ?= admin
+SERVICE_PASSWORD ?= JY9yZhXuKhNfGwfu+OrKfkBMFiHVwg0ehlP1NLthCIs
 SERVER_ADDRESS ?= "192.168.0.56"
 CA ?= "myvpn"
+
+OVPN_DATA ?= $(PWD)/"ovpn-data"
 DOCKER_IMAGE ?= kylemanna/openvpn
 REPOSITORY ?= https://github.com/kylemanna/docker-openvpn.git
 EXAMPLE_USER ?= user1
@@ -19,7 +23,7 @@ configure:
 .PHONY:
 run:
 	docker run --name openvpn -v $(OVPN_DATA):/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN -d $(DOCKER_IMAGE)
-	docker run -e DOCKER_IMAGE=$(DOCKER_IMAGE) -e OVPN_DATA=$(OVPN_DATA) --name vpn2go -v /var/run/docker.sock:/var/run/docker.sock -p 5000:5000 -d vpn2go
+	docker run -e SERVICE_USER=$(SERVICE_USER) -e SERVICE_PASSWORD=$(SERVICE_PASSWORD) -e DOCKER_IMAGE=$(DOCKER_IMAGE) -e OVPN_DATA=$(OVPN_DATA) --name vpn2go -v /var/run/docker.sock:/var/run/docker.sock -p 5000:5000 -d vpn2go
 
 .PHONY:
 stop:
