@@ -29,7 +29,7 @@ The goal of this project is creating a basic configuration for docker-openvpn an
 
 ## How to use the API
 
-### List all created certificates (including server certificate)
+### List all created certificates
 
 `curl -u SERVICE_USER:SERVICE_PASSWORD SERVER_ADDRESS:5000`
 

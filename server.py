@@ -9,6 +9,7 @@ DOCKER_IMAGE = os.getenv('DOCKER_IMAGE', 'kylemanna/openvpn')
 OVPN_DATA = os.getenv('OVPN_DATA', f'{os.getcwd()}/ovpn-data')
 SERVICE_USER = os.getenv('SERVICE_USER')
 SERVICE_PASSWORD = os.getenv('SERVICE_PASSWORD')
+SERVER_ADDRESS = os.getenv('SERVER_ADDRESS', '127.0.0.1')
 
 
 def run_on_vpn_docker(command):
@@ -53,7 +54,7 @@ async def handle_get(request):
 
 def get_certs_list():
     output = run_on_vpn_docker(command=f"ls /etc/openvpn/pki/issued")
-    return output.decode('ascii')
+    return output.decode('ascii').replace(SERVER_ADDRESS, '')
 
 
 async def handle_get_all(request):
