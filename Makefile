@@ -45,7 +45,7 @@ configure:
 run:
 	docker run --name openvpn --restart always -v $(OVPN_DATA):/etc/openvpn -d -p $(VPN_PORT):1194/$(PROTOCOL) --cap-add=NET_ADMIN -d $(DOCKER_IMAGE)
 	docker run --restart always -e SERVER_ADDRESS=$(SERVER_ADDRESS) -e SERVICE_USER=$(SERVICE_USER) -e SERVICE_PASSWORD=$(SERVICE_PASSWORD) -e DOCKER_IMAGE=$(DOCKER_IMAGE) -e OVPN_DATA=$(OVPN_DATA) --name vpn2go -v /var/run/docker.sock:/var/run/docker.sock -p 127.0.0.1:5000:5000 -d vpn2go
-	docker run --name proxy-vpn2go -p 80:80 -p 443:443 -v $(PWD)/Caddyfile:/etc/caddy/Caddyfile --link vpn2go -d caddy
+	docker run --name proxy-vpn2go -p 80:80 -p 443:443 -v $(PWD)/Caddyfile:/etc/caddy/Caddyfile -v $(PWD)/caddy:/root/.caddy --link vpn2go -d caddy
 
 .PHONY:
 stop:
