@@ -33,6 +33,7 @@ build:
 	docker build -t vpn2go .
 	git clone $(REPOSITORY)
 	cd docker-openvpn && docker build -t $(DOCKER_IMAGE) .
+	rm -Rf docker-openvpn
 
 .PHONY:
 configure:

@@ -58,7 +58,8 @@ def get_certs_list():
 
 
 async def handle_get_all(request):
-    return web.Response(text=get_certs_list().replace('.crt', ''))
+    output = run_on_vpn_docker('ovpn_listclients')
+    return web.Response(text=output.decode('ascii'))
 
 
 async def handle_status(request):
