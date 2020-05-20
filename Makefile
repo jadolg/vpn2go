@@ -9,6 +9,7 @@ VPN_PORT ?= 1194
 SERVER_SUBNET ?= 192.168.253.0/24
 DNS_SERVER ?= 1.1.1.1
 CLIENT_TO_CLIENT ?= no
+COMPRESSION ?= yes
 
 ifeq ($(CLIENT_TO_CLIENT), yes)
 	CLIENT_TO_CLIENT_FLAG := -c
@@ -16,6 +17,11 @@ else
 	CLIENT_TO_CLIENT_FLAG :=
 endif
 
+ifeq ($(COMPRESSION), yes)
+	COMPRESSION_FLAG := -z
+else
+	COMPRESSION_FLAG :=
+endif
 
 OVPN_DATA ?= $(PWD)/"ovpn-data"
 DOCKER_IMAGE ?= kylemanna/openvpn
@@ -30,7 +36,7 @@ build:
 
 .PHONY:
 configure:
-	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) -z -s $(SERVER_SUBNET) -n $(DNS_SERVER)
+	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(DNS_SERVER)
 	docker run --rm -v $(OVPN_DATA):/etc/openvpn -i -e "EASYRSA_BATCH=1" -e "EASYRSA_REQ_CN="$(CA) $(DOCKER_IMAGE) ovpn_initpki nopass
 	printf "localhost, $(SERVER_ADDRESS)\nreverse_proxy vpn2go:5000" > Caddyfile
 

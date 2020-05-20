@@ -29,6 +29,7 @@ The goal of this project is creating a basic configuration for docker-openvpn an
 - SERVER_SUBNET (default:192.168.253.0/24)
 - DNS_SERVER (default:1.1.1.1)
 - CLIENT_TO_CLIENT (default:no) Set this to yes if you want the clients to communicate amongst themselves.
+- COMPRESSION (default:yes)
 6. Execute `make configure` to generate the base OpenVPN configuration
 7. Execute `make run` to start the services
 8. Open ports 5000/tcp and 1194/udp in your firewall
