@@ -4,7 +4,9 @@ SERVICE_PASSWORD ?= JY9yZhXuKhNfGwfu+OrKfkBMFiHVwg0ehlP1NLthCIs
 SERVER_ADDRESS ?= 192.168.0.56
 CA ?= myvpn
 PROTOCOL ?= udp
-VPN_PORT = 1194
+VPN_PORT ?= 1194
+SERVER_SUBNET ?= 192.168.253.0/24
+DNS_SERVER ?= 1.1.1.1
 
 OVPN_DATA ?= $(PWD)/"ovpn-data"
 DOCKER_IMAGE ?= kylemanna/openvpn
@@ -19,7 +21,7 @@ build:
 
 .PHONY:
 configure:
-	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) -c
+	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) -c -z -s $(SERVER_SUBNET) -n $(DNS_SERVER)
 	docker run --rm -v $(OVPN_DATA):/etc/openvpn -i -e "EASYRSA_BATCH=1" -e "EASYRSA_REQ_CN="$(CA) $(DOCKER_IMAGE) ovpn_initpki nopass
 	printf "localhost, $(SERVER_ADDRESS)\nreverse_proxy vpn2go:5000" > Caddyfile
 
