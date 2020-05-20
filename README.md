@@ -23,9 +23,15 @@ The goal of this project is creating a basic configuration for docker-openvpn an
 4. Export the customization variables to your environment
 - SERVER_ADDRESS
 - CA
-5. Execute `make configure` to generate the base OpenVPN configuration
-6. Execute `make run` to start the services
-7. Open ports 5000/tcp and 1194/udp in your firewall
+5. Customize your server with these extra variables (optional)
+- PROTOCOL (default:udp)
+- VPN_PORT (default:1194)
+- SERVER_SUBNET (default:192.168.253.0/24)
+- DNS_SERVER (default:1.1.1.1)
+- CLIENT_TO_CLIENT (default:no) Set this to yes if you want the clients to communicate amongst themselves.
+6. Execute `make configure` to generate the base OpenVPN configuration
+7. Execute `make run` to start the services
+8. Open ports 5000/tcp and 1194/udp in your firewall
 
 ## How to use the API
 
