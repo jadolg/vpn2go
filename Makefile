@@ -66,6 +66,7 @@ revoke_example_user:
 clean:
 	rm -Rf docker-openvpn
 	sudo rm -Rf $(OVPN_DATA)
+	sudo rm -Rf caddy
 	rm -f $(EXAMPLE_USER).ovpn
 	rm -f Caddyfile
 	docker rmi $(DOCKER_IMAGE)
