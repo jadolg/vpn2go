@@ -49,6 +49,7 @@ async def handle_revoke(request):
     user = request.match_info.get('user', "")
     if user != "" and f'{user}.crt' in get_certs_list():
         run_on_vpn_docker(command=f"bash -c \"echo 'yes' | ovpn_revokeclient {user}\"")
+        run_on_vpn_docker(command=f'rm -f /etc/openvpn/ccd/{user}')
     else:
         return web.Response(text='not found', status=404)
     return web.Response(text='ok')
