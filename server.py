@@ -1,5 +1,7 @@
+import ipaddress
 import logging
 import os
+from ipaddress import IPv4Address
 
 import docker
 from aiohttp import web
@@ -28,6 +30,15 @@ async def handle_create(request):
         if f'{user}.crt' in get_certs_list():
             return web.Response(text='duplicated', status=409)
         run_on_vpn_docker(command=f"easyrsa build-client-full {user} nopass")
+        ip = post.get('ip')
+        if ip:
+            try:
+                address = ipaddress.IPv4Interface(ip)
+                run_on_vpn_docker(
+                    f'bash -c "echo ifconfig-push {address.ip} {address.netmask} > /etc/openvpn/ccd/{user}"')
+            except ipaddress.AddressValueError:
+                logging.error(f'invalid IPv4 address/mask provided {ip}')
+
         output = run_on_vpn_docker(command=f"ovpn_getclient {user}")
     else:
         return web.Response(text="invalid user", status=400)
