@@ -1,7 +1,6 @@
 import ipaddress
 import logging
 import os
-from ipaddress import IPv4Address
 
 import docker
 from aiohttp import web
