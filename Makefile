@@ -40,8 +40,8 @@ build:
 configure:
 	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(SERVER_IP_ADDRESS) -e "topology subnet"
 	docker run --rm -v $(OVPN_DATA):/etc/openvpn -i -e "EASYRSA_BATCH=1" -e "EASYRSA_REQ_CN="$(CA) $(DOCKER_IMAGE) ovpn_initpki nopass
-	printf "localhost, $(SERVER_ADDRESS)\nreverse_proxy vpn2go:5000\nroute /dnsmasq/* {\nuri strip_prefix /dnsmasq\nreverse_proxy dnsmasq:8080\n}" > Caddyfile
-	printf "log-queries\nno-resolv\nserver=$(DNS_SERVER)\nstrict-order" > dnsmasq.conf
+	printf "localhost, $(SERVER_ADDRESS)\nreverse_proxy vpn2go:5000\nroute /dnsmasq/* {\n\turi strip_prefix /dnsmasq\n\treverse_proxy dnsmasq:8080\n}" > Caddyfile
+	printf "log-queries\nno-resolv\nserver=$(DNS_SERVER)\nstrict-order\naddress=/$(SERVER_ADDRESS)/$(SERVER_IP_ADDRESS)" > dnsmasq.conf
 
 .PHONY:
 run:
