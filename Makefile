@@ -51,8 +51,8 @@ run:
 
 .PHONY:
 stop:
-	docker stop openvpn vpn2go proxy-vpn2go dns-vpn2go dnsmasq
-	docker rm openvpn vpn2go proxy-vpn2go dns-vpn2go dnsmasq
+	docker stop openvpn vpn2go proxy-vpn2go dnsmasq
+	docker rm openvpn vpn2go proxy-vpn2go dnsmasq
 
 
 .PHONY:
