@@ -2,6 +2,7 @@
 SERVICE_USER ?= admin
 SERVICE_PASSWORD ?= JY9yZhXuKhNfGwfu+OrKfkBMFiHVwg0ehlP1NLthCIs
 SERVER_ADDRESS ?= 192.168.0.56
+SERVER_IP_ADDRESS ?= 192.168.0.56
 CA ?= myvpn
 
 PROTOCOL ?= udp
@@ -37,7 +38,7 @@ build:
 
 .PHONY:
 configure:
-	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(SERVER_ADDRESS) -e "topology subnet"
+	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(SERVER_IP_ADDRESS) -e "topology subnet"
 	docker run --rm -v $(OVPN_DATA):/etc/openvpn -i -e "EASYRSA_BATCH=1" -e "EASYRSA_REQ_CN="$(CA) $(DOCKER_IMAGE) ovpn_initpki nopass
 	printf "localhost, $(SERVER_ADDRESS)\nreverse_proxy vpn2go:5000" > Caddyfile
 	printf "log-queries\nno-resolv\nserver=$(DNS_SERVER)\nstrict-order" > dnsmasq.conf
@@ -71,4 +72,5 @@ clean:
 	sudo rm -Rf caddy
 	rm -f $(EXAMPLE_USER).ovpn
 	rm -f Caddyfile
+	rm -f dnsmasq.conf
 	docker rmi $(DOCKER_IMAGE)

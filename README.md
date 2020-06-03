@@ -22,6 +22,7 @@ The goal of this project is creating a basic configuration for docker-openvpn an
 - SERVICE_PASSWORD
 4. Export the customization variables to your environment
 - SERVER_ADDRESS
+- SERVER_IP_ADDRESS
 - CA
 5. Customize your server with these extra variables (optional)
 - PROTOCOL (default:udp)
