@@ -37,20 +37,22 @@ build:
 
 .PHONY:
 configure:
-	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(DNS_SERVER) -e "topology subnet"
+	docker run --rm -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(SERVER_ADDRESS) -e "topology subnet"
 	docker run --rm -v $(OVPN_DATA):/etc/openvpn -i -e "EASYRSA_BATCH=1" -e "EASYRSA_REQ_CN="$(CA) $(DOCKER_IMAGE) ovpn_initpki nopass
 	printf "localhost, $(SERVER_ADDRESS)\nreverse_proxy vpn2go:5000" > Caddyfile
+	printf "log-queries\nno-resolv\nserver=$(DNS_SERVER)\nstrict-order" > dnsmasq.conf
 
 .PHONY:
 run:
 	docker run --restart always --name openvpn -v $(OVPN_DATA):/etc/openvpn -d -p $(VPN_PORT):1194/$(PROTOCOL) --cap-add=NET_ADMIN -d $(DOCKER_IMAGE)
 	docker run --restart always --name vpn2go -e SERVER_ADDRESS=$(SERVER_ADDRESS) -e SERVICE_USER=$(SERVICE_USER) -e SERVICE_PASSWORD=$(SERVICE_PASSWORD) -e DOCKER_IMAGE=$(DOCKER_IMAGE) -e OVPN_DATA=$(OVPN_DATA) -v /var/run/docker.sock:/var/run/docker.sock -p 127.0.0.1:5000:5000 -d vpn2go
+	docker run --restart always --name dnsmasq -d -p 53:53/udp -p 127.0.0.1:5380:8080 -v $(PWD)dnsmasq.conf:/etc/dnsmasq.conf --log-opt "max-size=100m" -e "HTTP_USER=$(SERVICE_USER)" -e "HTTP_PASS=$(SERVICE_PASSWORD)" jpillora/dnsmasq
 	docker run --restart always --name proxy-vpn2go -p 80:80 -p 443:443 -v $(PWD)/Caddyfile:/etc/caddy/Caddyfile -v $(PWD)/caddy:/data/ --link vpn2go -d caddy
 
 .PHONY:
 stop:
-	docker stop openvpn vpn2go proxy-vpn2go dns-vpn2go
-	docker rm openvpn vpn2go proxy-vpn2go dns-vpn2go
+	docker stop openvpn vpn2go proxy-vpn2go dns-vpn2go dnsmasq
+	docker rm openvpn vpn2go proxy-vpn2go dns-vpn2go dnsmasq
 
 
 .PHONY:
