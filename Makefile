@@ -47,7 +47,7 @@ configure:
 run:
 	docker run --restart always --name openvpn -v $(OVPN_DATA):/etc/openvpn -d -p $(VPN_PORT):1194/$(PROTOCOL) --cap-add=NET_ADMIN -d $(DOCKER_IMAGE)
 	docker run --restart always --name vpn2go -e SERVER_ADDRESS=$(SERVER_ADDRESS) -e SERVICE_USER=$(SERVICE_USER) -e SERVICE_PASSWORD=$(SERVICE_PASSWORD) -e DOCKER_IMAGE=$(DOCKER_IMAGE) -e OVPN_DATA=$(OVPN_DATA) -v /var/run/docker.sock:/var/run/docker.sock -p 127.0.0.1:5000:5000 -d vpn2go
-	docker run --restart always --name dnsmasq -d -p 53:53/udp -p 127.0.0.1:5380:8080 -v $(PWD)/dnsmasq.conf:/etc/dnsmasq.conf --log-opt "max-size=100m" -e "HTTP_USER=$(SERVICE_USER)" -e "HTTP_PASS=$(SERVICE_PASSWORD)" jpillora/dnsmasq
+	docker run --restart always --name dnsmasq -d -p 53:53/udp -v $(PWD)/dnsmasq.conf:/etc/dnsmasq.conf --log-opt "max-size=100m" -e "HTTP_USER=$(SERVICE_USER)" -e "HTTP_PASS=$(SERVICE_PASSWORD)" jpillora/dnsmasq
 	docker run --restart always --name proxy-vpn2go -p 80:80 -p 443:443 -v $(PWD)/Caddyfile:/etc/caddy/Caddyfile -v $(PWD)/caddy:/data/ --link vpn2go --link dnsmasq -d caddy
 
 .PHONY:
