@@ -36,6 +36,20 @@ if [[ ${create_user_code} -ne 200 ]]; then
     exit 1
 fi
 
+create_user_code=$(curl -i -u ${SERVICE_USER}:${SERVICE_PASSWORD} http://localhost:5000 -d '{"user":"userip", "ip":"192.168.255.2"}' 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+
+if [[ ${create_user_code} -ne 200 ]]; then
+    echo "user creation failed" $LINENO
+    exit 1
+fi
+
+create_user_code=$(curl -i -u ${SERVICE_USER}:${SERVICE_PASSWORD} http://localhost:5000 -d '{"user":"userduration", "duration":"5"}' 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+
+if [[ ${create_user_code} -ne 200 ]]; then
+    echo "user creation failed" $LINENO
+    exit 1
+fi
+
 if [[ $(get_http_code "curl -i -u ${SERVICE_USER}:${SERVICE_PASSWORD} http://localhost:5000/user") -ne 200 ]]; then
     echo "should get the already created user" $LINENO
     exit 1

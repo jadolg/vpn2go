@@ -49,6 +49,20 @@ output: a list of certificates
 
 output: a text configuration for openvpn
 
+### Create a new certificate with a fixed ip address
+
+`curl -X POST -u SERVICE_USER:SERVICE_PASSWORD SERVER_ADDRESS:5000 -d '{"user":"username", "ip":"192.168.253.5"}'`
+
+output: a text configuration for openvpn
+
+*note:* duplicates for ip address are not being handled. Use this at your own risk.
+
+### Create a new certificate with a specific duration in days (default is 1460)
+
+`curl -X POST -u SERVICE_USER:SERVICE_PASSWORD SERVER_ADDRESS:5000 -d '{"user":"username", "duration":"5"}'`
+
+output: a text configuration for openvpn
+
 ### Get user configuration
 
 `curl -u SERVICE_USER:SERVICE_PASSWORD SERVER_ADDRESS:5000/username`

@@ -13,22 +13,27 @@ SERVICE_PASSWORD = os.getenv('SERVICE_PASSWORD')
 SERVER_ADDRESS = os.getenv('SERVER_ADDRESS', '127.0.0.1')
 
 
-def run_on_vpn_docker(command):
+def run_on_vpn_docker(command, environment=None):
+    if environment is None:
+        environment = []
     client = docker.from_env()
     return client.containers.run(image=DOCKER_IMAGE, command=command,
                                  remove=True,
                                  detach=False,
                                  volumes={OVPN_DATA: {'bind': '/etc/openvpn', 'mode': 'rw'}},
-                                 stdout=True)
+                                 stdout=True,
+                                 environment=environment)
 
 
 async def handle_create(request):
     post = await request.json()
     user = post.get('user')
+    duration = post.get('duration', 1460)
     if user:
         if f'{user}.crt' in get_certs_list():
             return web.Response(text='duplicated', status=409)
-        run_on_vpn_docker(command=f"easyrsa build-client-full {user} nopass")
+        run_on_vpn_docker(command=f"easyrsa build-client-full {user} nopass",
+                          environment=[f"EASYRSA_CERT_EXPIRE={duration}", ])
         ip = post.get('ip')
         if ip:
             try:
