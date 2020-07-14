@@ -1,0 +1,53 @@
+version: "3"
+services:
+  openvpn:
+    image: $DOCKER_IMAGE
+    container_name: openvpn
+    restart: always
+    volumes:
+      - $OVPN_DATA:/etc/openvpn
+    ports:
+      - $VPN_PORT:1194/$PROTOCOL
+    cap_add:
+      - NET_ADMIN
+
+  vpn2go:
+    image: vpn2go
+    container_name: vpn2go
+    environment:
+      - DOCKER_IMAGE=$DOCKER_IMAGE
+      - SERVER_ADDRESS=$SERVER_ADDRESS
+      - SERVICE_USER=$SERVICE_USER
+      - SERVICE_PASSWORD=$SERVICE_PASSWORD
+      - OVPN_DATA=$OVPN_DATA
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 127.0.0.1:5000:5000
+
+  dnsmasq:
+    image: jpillora/dnsmasq
+    restart: always
+    ports:
+      - 53:53/udp
+    volumes:
+      - ./dnsmasq.conf:/etc/dnsmasq.conf
+    environment:
+      - HTTP_USER=$SERVICE_USER
+      - HTTP_PASS=$SERVICE_PASSWORD
+    logging:
+      options:
+        max-size: "100m"
+
+  proxy:
+    image: caddy
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile://etc/caddy/Caddyfile
+      - ./caddy:/data/
+    links:
+      - vpn2go
+      - dnsmasq
