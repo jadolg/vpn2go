@@ -27,7 +27,6 @@ endif
 OVPN_DATA ?= $(PWD)/"ovpn-data"
 DOCKER_IMAGE ?= kylemanna/openvpn
 REPOSITORY ?= https://github.com/kylemanna/docker-openvpn.git
-EXAMPLE_USER ?= user1
 
 DOCKER_COMPOSE= OVPN_DATA=$(OVPN_DATA) \
 				VPN_PORT=$(VPN_PORT) \
@@ -63,15 +62,6 @@ logs:
 .PHONY:
 stop:
 	$(DOCKER_COMPOSE) down
-
-.PHONY:
-create_example_user:
-	docker run -v $(OVPN_DATA):/etc/openvpn --log-driver=none --rm $(DOCKER_IMAGE) easyrsa build-client-full $(EXAMPLE_USER) nopass
-	docker run -v $(OVPN_DATA):/etc/openvpn --log-driver=none --rm $(DOCKER_IMAGE) ovpn_getclient $(EXAMPLE_USER) > $(EXAMPLE_USER).ovpn
-
-.PHONY:
-revoke_example_user:
-	docker run --rm -it -v $(OVPN_DATA):/etc/openvpn $(DOCKER_IMAGE) bash -c "echo 'yes' | ovpn_revokeclient $(EXAMPLE_USER)"
 
 .PHONY:
 clean:
