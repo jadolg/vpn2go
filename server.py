@@ -7,7 +7,7 @@ from aiohttp import web
 from aiohttp_basicauth import BasicAuthMiddleware
 
 DOCKER_IMAGE = os.getenv('DOCKER_IMAGE', 'kylemanna/openvpn')
-OVPN_DATA = os.getenv('OVPN_DATA', f'{os.getcwd()}/ovpn-data')
+OVPN_DATA = os.getenv('OVPN_DATA', '/ovpn-data')
 SERVICE_USER = os.getenv('SERVICE_USER')
 SERVICE_PASSWORD = os.getenv('SERVICE_PASSWORD')
 SERVER_ADDRESS = os.getenv('SERVER_ADDRESS', '127.0.0.1')
