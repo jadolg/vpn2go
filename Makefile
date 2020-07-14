@@ -24,7 +24,7 @@ else
 	COMPRESSION_FLAG :=
 endif
 
-OVPN_DATA ?= $(PWD)/"ovpn-data"
+OVPN_DATA ?= $(PWD)/ovpn-data
 DOCKER_IMAGE ?= kylemanna/openvpn
 REPOSITORY ?= https://github.com/kylemanna/docker-openvpn.git
 
