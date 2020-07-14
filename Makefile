@@ -57,7 +57,11 @@ run:
 
 .PHONY:
 logs:
-	$(DOCKER_COMPOSE) logs -f
+	$(DOCKER_COMPOSE) logs -f --tail =100
+
+.PHONY:
+ps:
+	$(DOCKER_COMPOSE) ps
 
 .PHONY:
 stop:
