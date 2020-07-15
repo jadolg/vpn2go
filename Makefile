@@ -15,11 +15,15 @@ else
 endif
 
 define CADDY_TEMPLATE=
-localhost, $(SERVER_ADDRESS)\n
-reverse_proxy vpn2go:5000\n
+localhost, $(SERVER_ADDRESS)
+reverse_proxy vpn2go:5000
 route /dnsmasq/* {
 	uri strip_prefix /dnsmasq
 	reverse_proxy dnsmasq:8080
+}
+route /admin/* {
+	uri strip_prefix /admin
+	reverse_proxy frontend:8989
 }
 endef
 export CADDY_TEMPLATE
@@ -31,6 +35,9 @@ build:
 	sed -i '/ENV EASYRSA_VARS_FILE $$OPENVPN\/vars/d' docker-openvpn/Dockerfile
 	cd docker-openvpn && docker build -t $(DOCKER_IMAGE) .
 	rm -Rf docker-openvpn
+	git clone https://github.com/wil92/vpn2go-frontend.git
+	cd vpn2go-frontend && API_URL=https://$(SERVER_ADDRESS) docker-compose build
+	rm -Rf vpn2go-frontend
 
 .PHONY:
 configure:
@@ -48,7 +55,7 @@ stop:
 	docker-compose down
 
 .PHONY:
-clean:
+clean: stop
 	-rm -Rf docker-openvpn
 	-sudo rm -Rf $(OVPN_DATA)
 	-sudo rm -Rf caddy

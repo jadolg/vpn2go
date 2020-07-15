@@ -51,3 +51,12 @@ services:
     links:
       - vpn2go
       - dnsmasq
+      - frontend
+
+  frontend:
+    image: vpn2go-frontend
+    restart: always
+    ports:
+      - 127.0.0.1:8989:80
+    links:
+      - vpn2go
