@@ -14,6 +14,23 @@ else
 	COMPRESSION_FLAG :=
 endif
 
+define CADDY_TEMPLATE=
+localhost, $(SERVER_ADDRESS)\n
+reverse_proxy vpn2go:5000\n
+route /dnsmasq/* {
+	uri strip_prefix /dnsmasq
+	reverse_proxy dnsmasq:8080
+}
+header / {
+  Access-Control-Allow-Origin "*"
+  Access-Control-Allow-Methods "OPTIONS, HEAD, GET, POST, PUT, DELETE"
+  Access-Control-Allow-Headers "X-File-Name, X-File-Type, X-File-Size, X-Requested-With"
+  X-Content-Type-Options "nosniff"
+  -Server
+}
+endef
+export CADDY_TEMPLATE
+
 .PHONY:
 build:
 	docker build -t vpn2go .
@@ -26,7 +43,7 @@ build:
 configure:
 	docker-compose run --rm openvpn ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(SERVER_IP_ADDRESS) -n $(DNS_SERVER) -e "topology subnet"
 	docker-compose run --rm -e "EASYRSA_BATCH=1" -e "EASYRSA_REQ_CN=$(CA)" openvpn ovpn_initpki nopass
-	printf "localhost, $(SERVER_ADDRESS)\nreverse_proxy vpn2go:5000\nroute /dnsmasq/* {\n\turi strip_prefix /dnsmasq\n\treverse_proxy dnsmasq:8080\n}" > Caddyfile
+	echo "$$CADDY_TEMPLATE" > Caddyfile
 	printf "log-queries\nno-resolv\nserver=$(DNS_SERVER)\nstrict-order\naddress=/$(SERVER_ADDRESS)/$(SERVER_IP_ADDRESS)" > dnsmasq.conf
 
 .PHONY:
