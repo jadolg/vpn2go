@@ -18,6 +18,7 @@ endif
 build:
 	docker build -t vpn2go .
 	git clone $(REPOSITORY)
+	sed -i '/ENV EASYRSA_VARS_FILE $$OPENVPN\/vars/d' docker-openvpn/Dockerfile
 	cd docker-openvpn && docker build -t $(DOCKER_IMAGE) .
 	rm -Rf docker-openvpn
 
