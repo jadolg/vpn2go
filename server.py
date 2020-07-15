@@ -5,12 +5,15 @@ import os
 import docker
 from aiohttp import web
 from aiohttp_basicauth import BasicAuthMiddleware
+import aiohttp_cors
 
 DOCKER_IMAGE = os.getenv('DOCKER_IMAGE', 'kylemanna/openvpn')
 OVPN_DATA = os.getenv('OVPN_DATA', '/ovpn-data')
 SERVICE_USER = os.getenv('SERVICE_USER')
 SERVICE_PASSWORD = os.getenv('SERVICE_PASSWORD')
 SERVER_ADDRESS = os.getenv('SERVER_ADDRESS', '127.0.0.1')
+
+auth = BasicAuthMiddleware(username=SERVICE_USER, password=SERVICE_PASSWORD, force=False)
 
 
 def run_on_vpn_docker(command, environment=None):
@@ -25,6 +28,7 @@ def run_on_vpn_docker(command, environment=None):
                                  environment=environment)
 
 
+@auth.required
 async def handle_create(request):
     post = await request.json()
     user = post.get('user')
@@ -49,6 +53,7 @@ async def handle_create(request):
     return web.Response(text=output.decode('ascii'))
 
 
+@auth.required
 async def handle_revoke(request):
     user = request.match_info.get('user', "")
     if user != "" and f'{user}.crt' in get_certs_list():
@@ -59,6 +64,7 @@ async def handle_revoke(request):
     return web.Response(text='ok')
 
 
+@auth.required
 async def handle_get(request):
     user = request.match_info.get('user', "")
     if f'{user}.crt' in get_certs_list():
@@ -73,11 +79,13 @@ def get_certs_list():
     return output.decode('ascii').replace(SERVER_ADDRESS, '')
 
 
+@auth.required
 async def handle_get_all(request):
     output = run_on_vpn_docker('ovpn_listclients')
     return web.Response(text=output.decode('ascii'))
 
 
+@auth.required
 async def handle_status(request):
     client = docker.from_env()
     container = client.containers.get('openvpn')
@@ -91,7 +99,6 @@ async def handle_healthcheck(request):
 
 if __name__ == '__main__':
     if SERVICE_USER and SERVICE_PASSWORD:
-        auth = BasicAuthMiddleware(username=SERVICE_USER, password=SERVICE_PASSWORD)
         app = web.Application(middlewares=[auth])
     else:
         logging.warning('service is running without authentication')
@@ -100,7 +107,19 @@ if __name__ == '__main__':
     app.add_routes([web.post('/', handle_create)])
     app.add_routes([web.get('/', handle_get_all)])
     app.add_routes([web.get('/status', handle_status)])
+    app.add_routes([web.get('/healthcheck', handle_healthcheck)])
     app.add_routes([web.delete('/{user}', handle_revoke)])
     app.add_routes([web.get('/{user}', handle_get)])
-    app.add_routes([web.get('/healthcheck', handle_healthcheck)])
+
+    cors = aiohttp_cors.setup(app, defaults={
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+    })
+    # Configure CORS on all routes.
+    for route in list(app.router.routes()):
+        cors.add(route)
+
     web.run_app(app, host='0.0.0.0', port=5000)

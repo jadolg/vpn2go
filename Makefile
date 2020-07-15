@@ -21,13 +21,6 @@ route /dnsmasq/* {
 	uri strip_prefix /dnsmasq
 	reverse_proxy dnsmasq:8080
 }
-header / {
-  Access-Control-Allow-Origin "*"
-  Access-Control-Allow-Methods "OPTIONS, HEAD, GET, POST, PUT, DELETE"
-  Access-Control-Allow-Headers "X-File-Name, X-File-Type, X-File-Size, X-Requested-With"
-  X-Content-Type-Options "nosniff"
-  -Server
-}
 endef
 export CADDY_TEMPLATE
 
