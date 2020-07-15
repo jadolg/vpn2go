@@ -23,7 +23,7 @@ route /dnsmasq/* {
 }
 route /admin/* {
 	uri strip_prefix /admin
-	reverse_proxy frontend:8989
+	reverse_proxy frontend:80
 }
 endef
 export CADDY_TEMPLATE
