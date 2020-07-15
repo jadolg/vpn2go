@@ -56,7 +56,7 @@ services:
       - frontend
 
   frontend:
-    image: vpn2go-frontend
+    image: ggjnez92/vpn2go-frontend
     restart: always
     ports:
       - 127.0.0.1:8989:80
