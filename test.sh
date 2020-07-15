@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-export SERVICE_USER=test
-export SERVICE_PASSWORD=test
+
+source .env
 
 function get_http_code() {
     $1 2>/dev/null | head -n 1 | cut -d$' ' -f2
