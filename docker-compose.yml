@@ -12,8 +12,10 @@ services:
       - NET_ADMIN
 
   vpn2go:
-    image: vpn2go
+    image: guamulo/vpn2go
     container_name: vpn2go
+    build:
+      context: .
     environment:
       - DOCKER_IMAGE=$DOCKER_IMAGE
       - SERVER_ADDRESS=$SERVER_ADDRESS

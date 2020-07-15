@@ -30,14 +30,10 @@ export CADDY_TEMPLATE
 
 .PHONY:
 build:
-	docker build -t vpn2go .
-	git clone $(REPOSITORY)
-	sed -i '/ENV EASYRSA_VARS_FILE $$OPENVPN\/vars/d' docker-openvpn/Dockerfile
-	cd docker-openvpn && docker build -t $(DOCKER_IMAGE) .
-	rm -Rf docker-openvpn
-	git clone https://github.com/wil92/vpn2go-frontend.git
-	cd vpn2go-frontend && API_URL=$(SERVER_ADDRESS) docker-compose build
-	rm -Rf vpn2go-frontend
+	docker-compose build
+
+push:
+	docker push guamulo/vpn2go
 
 .PHONY:
 configure:
@@ -56,11 +52,7 @@ stop:
 
 .PHONY:
 clean: stop
-	-rm -Rf docker-openvpn
-	-rm -Rf vpn2go-frontend
 	-sudo rm -Rf $(OVPN_DATA)
 	-sudo rm -Rf caddy
-	-rm -f $(EXAMPLE_USER).ovpn
 	-rm -f Caddyfile
 	-rm -f dnsmasq.conf
-	-docker rmi $(DOCKER_IMAGE)
