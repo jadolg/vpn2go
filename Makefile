@@ -36,7 +36,7 @@ build:
 	cd docker-openvpn && docker build -t $(DOCKER_IMAGE) .
 	rm -Rf docker-openvpn
 	git clone https://github.com/wil92/vpn2go-frontend.git
-	cd vpn2go-frontend && API_URL=https://$(SERVER_ADDRESS) docker-compose build
+	cd vpn2go-frontend && API_URL=$(SERVER_ADDRESS) docker-compose build
 	rm -Rf vpn2go-frontend
 
 .PHONY:
