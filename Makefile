@@ -57,6 +57,7 @@ stop:
 .PHONY:
 clean: stop
 	-rm -Rf docker-openvpn
+	-rm -Rf vpn2go-frontend
 	-sudo rm -Rf $(OVPN_DATA)
 	-sudo rm -Rf caddy
 	-rm -f $(EXAMPLE_USER).ovpn
