@@ -2,6 +2,7 @@ import ipaddress
 import logging
 import os
 
+import aiohttp_cors
 import docker
 from aiohttp import web
 from aiohttp_basicauth import BasicAuthMiddleware
@@ -100,7 +101,20 @@ if __name__ == '__main__':
     app.add_routes([web.post('/', handle_create)])
     app.add_routes([web.get('/', handle_get_all)])
     app.add_routes([web.get('/status', handle_status)])
+    app.add_routes([web.get('/healthcheck', handle_healthcheck)])
     app.add_routes([web.delete('/{user}', handle_revoke)])
     app.add_routes([web.get('/{user}', handle_get)])
-    app.add_routes([web.get('/healthcheck', handle_healthcheck)])
+
+    cors = aiohttp_cors.setup(app, defaults={
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+    })
+
+    # Configure CORS on all routes.
+    for route in list(app.router.routes()):
+        cors.add(route)
+
     web.run_app(app, host='0.0.0.0', port=5000)
