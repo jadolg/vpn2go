@@ -31,7 +31,7 @@ services:
     image: jpillora/dnsmasq
     restart: always
     ports:
-      - 53:53/udp
+      - 6353:53/udp
     volumes:
       - ./dnsmasq.conf:/etc/dnsmasq.conf
     environment:

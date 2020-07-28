@@ -16,14 +16,14 @@ endif
 
 define CADDY_TEMPLATE=
 localhost, $(SERVER_ADDRESS)
-reverse_proxy vpn2go:5000
+reverse_proxy frontend:80
 route /dnsmasq/* {
 	uri strip_prefix /dnsmasq
 	reverse_proxy dnsmasq:8080
 }
-route /admin/* {
-	uri strip_prefix /admin
-	reverse_proxy frontend:80
+route /api/v1* {
+	uri strip_prefix /api/v1
+	reverse_proxy vpn2go:5000
 }
 endef
 export CADDY_TEMPLATE
