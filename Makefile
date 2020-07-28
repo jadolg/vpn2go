@@ -17,10 +17,6 @@ endif
 define CADDY_TEMPLATE=
 localhost, $(SERVER_ADDRESS)
 reverse_proxy frontend:80
-route /dnsmasq/* {
-	uri strip_prefix /dnsmasq
-	reverse_proxy dnsmasq:8080
-}
 route /api/v1* {
 	uri strip_prefix /api/v1
 	reverse_proxy vpn2go:5000
@@ -37,10 +33,9 @@ push:
 
 .PHONY:
 configure:
-	docker-compose run --rm openvpn ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(SERVER_IP_ADDRESS) -n $(DNS_SERVER) -e "topology subnet"
+	docker-compose run --rm openvpn ovpn_genconfig -u $(PROTOCOL)://$(SERVER_ADDRESS):$(VPN_PORT) $(CLIENT_TO_CLIENT_FLAG) $(COMPRESSION_FLAG) -s $(SERVER_SUBNET) -n $(DNS_SERVER) -e "topology subnet"
 	docker-compose run --rm -e "EASYRSA_BATCH=1" -e "EASYRSA_REQ_CN=$(CA)" openvpn ovpn_initpki nopass
 	echo "$$CADDY_TEMPLATE" > Caddyfile
-	printf "log-queries\nno-resolv\nserver=$(DNS_SERVER)\nstrict-order\naddress=/$(SERVER_ADDRESS)/$(SERVER_IP_ADDRESS)" > dnsmasq.conf
 
 .PHONY:
 run:
@@ -55,4 +50,3 @@ clean: stop
 	-sudo rm -Rf $(OVPN_DATA)
 	-sudo rm -Rf caddy
 	-rm -f Caddyfile
-	-rm -f dnsmasq.conf

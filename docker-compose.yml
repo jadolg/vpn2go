@@ -27,20 +27,6 @@ services:
     ports:
       - 127.0.0.1:5000:5000
 
-  dnsmasq:
-    image: jpillora/dnsmasq
-    restart: always
-    ports:
-      - 6353:53/udp
-    volumes:
-      - ./dnsmasq.conf:/etc/dnsmasq.conf
-    environment:
-      - HTTP_USER=$SERVICE_USER
-      - HTTP_PASS=$SERVICE_PASSWORD
-    logging:
-      options:
-        max-size: "100m"
-
   proxy:
     image: caddy
     restart: always
@@ -52,7 +38,6 @@ services:
       - ./caddy:/data/
     links:
       - vpn2go
-      - dnsmasq
       - frontend
 
   frontend:
