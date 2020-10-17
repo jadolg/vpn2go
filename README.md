@@ -17,7 +17,7 @@ The goal of this project is creating a basic configuration for docker-openvpn an
 ## How to deploy
 1. Clone the project and cd into it
 2. Execute `make build` to build the docker images
-3. Edit the .env file and adapt the security related variables to your environment with save values
+3. Edit the .env file and adapt the security related variables to your environment with safe values
 - SERVICE_USER
 - SERVICE_PASSWORD
 4. Export the customization variables to your environment
