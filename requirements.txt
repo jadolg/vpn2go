@@ -1,4 +1,4 @@
-aiohttp==3.6.2
+aiohttp==3.7.4
 docker==4.2.0
 aiohttp-basicauth==0.2.0
 aiohttp-cors==0.7.0
