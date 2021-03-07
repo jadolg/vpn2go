@@ -14,6 +14,7 @@ services:
   vpn2go:
     image: guamulo/vpn2go
     container_name: vpn2go
+    restart: always
     build:
       context: .
     environment:
