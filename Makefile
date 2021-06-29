@@ -46,6 +46,14 @@ stop:
 	docker-compose down
 
 .PHONY:
+logs:
+	docker-compose logs -f --tail=50
+
+.PHONY:
+status:
+	docker-compose ps
+
+.PHONY:
 clean: stop
 	-sudo rm -Rf $(OVPN_DATA)
 	-sudo rm -Rf caddy
